@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
+import React from "react";
 import styled from "styled-components";
 import chevronLeft from "../assets/icons/chevron-left.svg";
 import { colors } from "../variables";
-import * as Styled from "./components";
+import * as Styled from "./styled";
 import { IconButton } from "./Button";
 import Typography from "./Typography";
 import { getMonthName } from "./utils";
@@ -20,50 +20,66 @@ const InputValue = styled.div`
   text-align: center;
 `;
 
+const InputHidden = styled.input`
+  border: none;
+  height: 0;
+  position: absolute;
+  padding: 0;
+  width: 0;
+`;
+
 const ImageRotated = styled.img`
   transform: rotate(180deg);
 `;
-
-export type ChangeActionType = "increment" | "decrement";
 
 export default function ReachDate({
   currentDate,
   reachDate,
   label,
-  onChange,
+  onDecrement,
+  onIncrement,
 }: {
   currentDate: Date;
   reachDate: Date;
   label: string;
-  onChange: (action: ChangeActionType) => void;
+  onDecrement: () => void;
+  onIncrement: () => void;
 }) {
-  const prevButtonRef = useRef<HTMLButtonElement>(null);
-  const nextButtonRef = useRef<HTMLButtonElement>(null);
-
   const backButtonDisabled =
     reachDate.getMonth() <= currentDate.getMonth() &&
     reachDate.getFullYear() <= currentDate.getFullYear();
 
   function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "ArrowLeft") {
-      !prevButtonRef.current?.disabled && onChange("decrement");
+    if (e.key === "ArrowLeft" && !backButtonDisabled) {
+      onDecrement();
     } else if (e.key === "ArrowRight") {
-      onChange("increment");
+      onIncrement();
     }
   }
 
   return (
-    <Styled.InputLabel onKeyDown={onKeyDown}>
+    <Styled.InputLabel htmlFor="reachdate" data-testid="reach-date-label">
       <Typography variant="description">{label}</Typography>
 
       <ReachDateInputField>
         <IconButton
-          ref={prevButtonRef}
+          data-testid="decrement-button"
           disabled={backButtonDisabled}
-          onClick={() => onChange("decrement")}
+          onClick={onDecrement}
+          onKeyDown={onKeyDown}
         >
           <img src={chevronLeft} alt="Chevron Left" />
         </IconButton>
+
+        <InputHidden
+          readOnly
+          aria-hidden
+          type="text"
+          id="reachdate"
+          data-testid="reach-date-input"
+          onKeyDown={onKeyDown}
+          value={reachDate.toDateString()}
+        />
 
         <InputValue>
           <Typography variant="paragraph">
@@ -75,7 +91,11 @@ export default function ReachDate({
           </Typography>
         </InputValue>
 
-        <IconButton ref={nextButtonRef} onClick={() => onChange("increment")}>
+        <IconButton
+          data-testid="increment-button"
+          onClick={onIncrement}
+          onKeyDown={onKeyDown}
+        >
           <ImageRotated src={chevronLeft} alt="Chevron Right" />
         </IconButton>
       </ReachDateInputField>

@@ -4,10 +4,10 @@ import buyAHouseLogo from "../assets/icons/buy-a-house.svg";
 import { colors, desktopMinWidth, mobileMinWidth } from "../variables";
 import Amount from "./Amount";
 import { LabelButton } from "./Button";
-import ReachDate, { ChangeActionType } from "./ReachDate";
+import ReachDate from "./ReachDate";
 import Summary from "./Summary";
 import Typography from "./Typography";
-import { createDate, monthDiff } from "./utils";
+import { addMonths, createDate, monthDiff } from "./utils";
 
 const StyledSection = styled.section`
   background: ${colors.white};
@@ -89,19 +89,16 @@ export default function PlanSimulation() {
   // month is the start of the saving goal.
   const monthlyDeposits = monthDiff(currentDate.current, reachDate) + 1;
 
-  function onChangeDate(action: ChangeActionType) {
-    const amount = action === "increment" ? 1 : -1;
+  const hasMonthlyAmount = Boolean(
+    !!amount && monthlyDeposits >= 1 && reachDate
+  );
 
-    setReachDate((_reachDate) => {
-      const nextDate = new Date(_reachDate.getTime());
-      nextDate.setMonth(nextDate.getMonth() + amount);
-
-      return nextDate;
-    });
+  function addMonthsToReachDate(amount: number) {
+    setReachDate((prevReachDate) => addMonths(prevReachDate, amount));
   }
 
   return (
-    <StyledSection>
+    <StyledSection data-testid="plan-simulation">
       <StyledHeader>
         <img src={buyAHouseLogo} alt="Plan Simulation Logo Type" />
 
@@ -119,6 +116,7 @@ export default function PlanSimulation() {
       <StyledMain>
         <StyledGridArea gridArea="amount">
           <Amount
+            autoFocus
             label="Total amount"
             onChange={(amount) => setAmount(amount)}
           />
@@ -126,25 +124,28 @@ export default function PlanSimulation() {
 
         <StyledGridArea gridArea="reach-date">
           <ReachDate
+            label="Reach goal by"
             currentDate={currentDate.current}
             reachDate={reachDate}
-            label="Reach goal by"
-            onChange={onChangeDate}
+            onDecrement={() => addMonthsToReachDate(-1)}
+            onIncrement={() => addMonthsToReachDate(1)}
           />
         </StyledGridArea>
 
-        <StyledGridArea gridArea="summary">
-          <Summary
-            amount={amount}
-            months={monthlyDeposits}
-            reachDate={reachDate}
-          />
-        </StyledGridArea>
+        {hasMonthlyAmount && (
+          <StyledGridArea gridArea="summary">
+            <Summary
+              amount={amount!}
+              months={monthlyDeposits}
+              reachDate={reachDate}
+            />
+          </StyledGridArea>
+        )}
       </StyledMain>
 
-      {!!amount && monthlyDeposits >= 1 && reachDate && (
+      {hasMonthlyAmount && (
         <ButtonWrapper>
-          <LabelButton onClick={() => console.log("On Confirm called")}>
+          <LabelButton data-testid="confirm-button" onClick={() => {}}>
             <Typography variant="button" color={colors.white}>
               Confirm
             </Typography>

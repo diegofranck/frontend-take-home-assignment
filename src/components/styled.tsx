@@ -48,7 +48,16 @@ const LabelButton = styled(Button)`
   display: flex;
   height: 56px;
   justify-content: center;
+  transition: background-color 100ms linear;
   width: 100%;
+
+  &:hover {
+    background-color: ${colors.brandPrimaryHover};
+  }
+
+  &:active {
+    background-color: ${colors.brandPrimaryActive};
+  }
 `;
 
 export { IconButton, InputField, InputLabel, LabelButton };

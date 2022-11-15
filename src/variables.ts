@@ -7,6 +7,8 @@ const colors = {
   blueGray600: "#4D6475",
   blueGray900: "#1E2A32",
   brandPrimary: "#1B31A8",
+  brandPrimaryHover: "#4760e2",
+  brandPrimaryActive: "#0d1750",
   brandSecondary: "#0079FF",
 };
 

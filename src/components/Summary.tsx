@@ -34,16 +34,12 @@ export default function Summary({
   months,
   reachDate,
 }: {
-  amount: number | null;
+  amount: number;
   months: number;
   reachDate: Date;
 }) {
-  if (!amount || !months) {
-    return null;
-  }
-
   return (
-    <StyledContainer>
+    <StyledContainer data-testid="summary">
       <StyledTopContainer>
         <Typography variant="subtitle">Monthly amount</Typography>
 

@@ -1,5 +1,5 @@
 import React from "react";
-import * as Styled from "./components";
+import * as Styled from "./styled";
 
 type ButtonProps = React.ComponentPropsWithoutRef<"button">;
 
