@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import buyAHouseLogo from "../assets/icons/buy-a-house.svg";
+import useLocalStorage from "../hooks/useLocalStorage";
 import { colors, desktopMinWidth, mobileMinWidth } from "../variables";
 import Amount from "./Amount";
 import { LabelButton } from "./Button";
@@ -73,16 +75,12 @@ const ButtonWrapper = styled.div`
   }
 `;
 
-const originLocalStorageKey = "origin";
-const planType = "buy-house";
-
-interface PersistedData {
-  amount: number;
-  reachDate: string;
-}
-
 export default function PlanSimulation() {
+  const { slug = "" } = useParams<string>();
+
   const currentDate = useRef(createDate({ day: 1 }));
+
+  const { data, setData } = useLocalStorage();
 
   const [amount, setAmount] = useState<number | null>(null);
   const [reachDate, setReachDate] = useState<Date>(
@@ -94,18 +92,16 @@ export default function PlanSimulation() {
   );
 
   useEffect(() => {
-    const originData = window.localStorage.getItem(originLocalStorageKey);
-    const originDataJSON =
-      originData &&
-      (JSON.parse(originData) as { [key: string]: PersistedData });
+    const dataBySlug = data?.[slug];
 
-    if (originDataJSON && planType in originDataJSON) {
-      const { amount, reachDate } = originDataJSON[planType];
-
-      setAmount(amount);
-      setReachDate(new Date(reachDate));
+    if (dataBySlug?.amount) {
+      setAmount(dataBySlug.amount);
     }
-  }, []);
+
+    if (dataBySlug?.reachDate) {
+      setReachDate(new Date(dataBySlug.reachDate));
+    }
+  }, [slug, data]);
 
   // Adding 1 month considering that the current
   // month is the start of the saving goal.
@@ -120,21 +116,27 @@ export default function PlanSimulation() {
   }
 
   function persistData() {
-    if (!amount && !reachDate) {
-      alert("Total amount and reach goal by are mandatory!");
+    if (amount && reachDate) {
+      const reachDateISO = reachDate.toISOString();
+
+      setData((prevData) => {
+        const nextData = {
+          ...prevData,
+          [slug]: {
+            amount,
+            reachDate: reachDateISO,
+          },
+        };
+
+        return nextData;
+      });
+
+      alert("Data successfully persisted!");
+
+      return;
     }
 
-    window.localStorage.setItem(
-      originLocalStorageKey,
-      JSON.stringify({
-        "buy-house": {
-          amount,
-          reachDate,
-        },
-      })
-    );
-
-    alert("Data successfully persisted!");
+    alert("Total amount and reach goal by are mandatory!");
   }
 
   return (

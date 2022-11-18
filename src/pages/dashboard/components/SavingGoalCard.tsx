@@ -40,10 +40,12 @@ export default function SavingGoalCard({
   icon,
   label,
   goal,
+  onClick,
 }: {
   icon: string;
   label: string;
-  goal?: PersistedGoal;
+  goal: PersistedGoal | null;
+  onClick: () => void;
 }) {
   const reachDate = goal && new Date(goal.reachDate);
 
@@ -82,7 +84,7 @@ export default function SavingGoalCard({
       )}
 
       <ButtonWrapper>
-        <LabelButton data-testid="setup-goal-button" onClick={() => {}}>
+        <LabelButton data-testid="setup-goal-button" onClick={onClick}>
           <Typography variant="button" color={colors.white}>
             Setup Goal
           </Typography>

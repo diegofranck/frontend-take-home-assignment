@@ -39,7 +39,7 @@ export default function Amount({
           decimalSeparator="."
           decimalsLimit={2}
           groupSeparator=","
-          value={amount ? amount : ""}
+          value={amount !== null ? amount : ""}
           onValueChange={(amount) => onChange(Number(amount))}
         />
       </Styled.InputField>
