@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import buyAHouseLogo from "../assets/icons/buy-a-house.svg";
 import { colors, desktopMinWidth, mobileMinWidth } from "../variables";
@@ -73,6 +73,14 @@ const ButtonWrapper = styled.div`
   }
 `;
 
+const originLocalStorageKey = "origin";
+const planType = "buy-house";
+
+interface PersistedData {
+  amount: number;
+  reachDate: string;
+}
+
 export default function PlanSimulation() {
   const currentDate = useRef(createDate({ day: 1 }));
 
@@ -84,6 +92,20 @@ export default function PlanSimulation() {
       year: currentDate.current.getFullYear(),
     })
   );
+
+  useEffect(() => {
+    const originData = window.localStorage.getItem(originLocalStorageKey);
+    const originDataJSON =
+      originData &&
+      (JSON.parse(originData) as { [key: string]: PersistedData });
+
+    if (originDataJSON && planType in originDataJSON) {
+      const { amount, reachDate } = originDataJSON[planType];
+
+      setAmount(amount);
+      setReachDate(new Date(reachDate));
+    }
+  }, []);
 
   // Adding 1 month considering that the current
   // month is the start of the saving goal.
@@ -103,7 +125,7 @@ export default function PlanSimulation() {
     }
 
     window.localStorage.setItem(
-      "origin",
+      originLocalStorageKey,
       JSON.stringify({
         "buy-house": {
           amount,
@@ -136,6 +158,7 @@ export default function PlanSimulation() {
           <Amount
             autoFocus
             label="Total amount"
+            amount={amount}
             onChange={(amount) => setAmount(amount)}
           />
         </StyledGridArea>

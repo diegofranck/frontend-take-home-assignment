@@ -16,10 +16,12 @@ const AmountInputField = styled(CurrencyInput)`
 
 export default function Amount({
   label,
+  amount,
   autoFocus,
   onChange,
 }: {
   label: string;
+  amount?: number | null;
   autoFocus?: boolean;
   onChange: (amount: number) => void;
 }) {
@@ -37,6 +39,7 @@ export default function Amount({
           decimalSeparator="."
           decimalsLimit={2}
           groupSeparator=","
+          value={amount ? amount : ""}
           onValueChange={(amount) => onChange(Number(amount))}
         />
       </Styled.InputField>
