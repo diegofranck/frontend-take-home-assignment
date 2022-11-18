@@ -97,6 +97,24 @@ export default function PlanSimulation() {
     setReachDate((prevReachDate) => addMonths(prevReachDate, amount));
   }
 
+  function persistData() {
+    if (!amount && !reachDate) {
+      alert("Total amount and reach goal by are mandatory!");
+    }
+
+    window.localStorage.setItem(
+      "origin",
+      JSON.stringify({
+        "buy-house": {
+          amount,
+          reachDate,
+        },
+      })
+    );
+
+    alert("Data successfully persisted!");
+  }
+
   return (
     <StyledSection data-testid="plan-simulation">
       <StyledHeader>
@@ -145,7 +163,7 @@ export default function PlanSimulation() {
 
       {hasMonthlyAmount && (
         <ButtonWrapper>
-          <LabelButton data-testid="confirm-button" onClick={() => {}}>
+          <LabelButton data-testid="confirm-button" onClick={persistData}>
             <Typography variant="button" color={colors.white}>
               Confirm
             </Typography>
